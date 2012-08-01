@@ -1,4 +1,4 @@
-package Model;
+package model.enums;
 
 public enum Channel {
 	Memory,

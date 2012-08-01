@@ -1,4 +1,4 @@
-package Control;
+package constants;
 
 public interface MessagesCode {
 

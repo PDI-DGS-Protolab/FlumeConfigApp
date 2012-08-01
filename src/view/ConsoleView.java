@@ -1,17 +1,18 @@
-package View;
+package view;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Scanner;
 
-import Model.Agent;
-import Model.Channel;
-import Model.Reliability;
-import Model.Sink;
-import Model.Source;
+import model.Agent;
+import model.enums.Channel;
+import model.enums.Reliability;
+import model.enums.Sink;
+import model.enums.Source;
 
-public class ConsoleView extends Observable{
+
+public class ConsoleView extends Observable {
 
 	public String fileNotFound(){
 		System.out.println("Config folder wasn't found. Please specify it: ");
@@ -20,11 +21,13 @@ public class ConsoleView extends Observable{
 	}
 	
 	public void startSetup(){
-		boolean advanced=true;;
+		List<Agent> agents=new LinkedList<Agent>();
+		boolean advanced=true;
 		Scanner sc= new Scanner(System.in);
+		
 		System.out.println("Introduce the number of agents: ");
 		int n=sc.nextInt();
-		List<Agent> agents=new LinkedList<Agent>();
+		
 		System.out.println("Do you wish to have an advanced config? [S/n] ");
 		String opt=sc.nextLine();
 		if(opt.equalsIgnoreCase("n")) advanced=false;
@@ -46,14 +49,15 @@ public class ConsoleView extends Observable{
 			source=selectSource(sc);
 			sink=selectSink(sc);
 			
-			if(advanced){
+			if (advanced) {
 				channel=selectChannel(sc);
 				rLevel=selectLevel(sc);
-			}else{
+			} else {
 				channel=Channel.Memory;
 				rLevel=Reliability.DFO;
 			}
-			Agent a=new Agent(host,port,source,sink,rLevel,channel);
+			
+			Agent a = new Agent(host,port,source,sink,rLevel,channel);
 			agents.add(a);			
 		}	
 
@@ -68,19 +72,20 @@ public class ConsoleView extends Observable{
 		System.out.println("Introduce the desired Channel");
 		System.out.println("memory, file, jdbc, ptransaction, rmemory: ");
 		while(!ok){
-
 			ok=true;
 			opt=sc.nextLine();
+			
 			if (opt.equalsIgnoreCase("memory")) channel=Channel.Memory;
 			else if (opt.equalsIgnoreCase("file")) channel=Channel.File;
 			else if (opt.equalsIgnoreCase("jdbc")) channel=Channel.JDBC;
 			else if (opt.equalsIgnoreCase("ptransaction")) channel=Channel.PTransaction;
 			else if (opt.equalsIgnoreCase("rmemory")) channel=Channel.RMemory;
-			else{
+			else {
 				System.out.println("Incorrect option. Please introduce a valid one: ");
 				ok=false;
 			}
 		}
+		
 		return channel;
 	}
 	
@@ -95,16 +100,18 @@ public class ConsoleView extends Observable{
 		while(!ok){
 			ok=true;
 			opt=sc.nextLine();
+			
 			if (opt.equalsIgnoreCase("Avro")) source=Source.Avro;
 			else if (opt.equalsIgnoreCase("Exec")) source=Source.Exec;
 			else if (opt.equalsIgnoreCase("Netcat")) source=Source.Netcat;
 			else if (opt.equalsIgnoreCase("SGenerator")) source=Source.SGenerator;
 			else if (opt.equalsIgnoreCase("Syslog")) source=Source.Syslog;
-			else{
+			else {
 				System.out.println("Incorrect option. Please introduce a valid one: ");
 				ok=false;
 			}
 		}
+		
 		return source;
 	}
 	
@@ -115,8 +122,10 @@ public class ConsoleView extends Observable{
 		
 		System.out.println("Introduce the desired Sink: ");
 		System.out.println("HDFS, Logger, Avro, Irc, FRoll, Null, HBase,");
+		
 		while(!ok){
 			opt=sc.nextLine();
+			
 			if(opt.equalsIgnoreCase("HDFS")) sink=Sink.HDFS;
 			else if(opt.equalsIgnoreCase("Avro")) sink=Sink.Avro;
 			else if(opt.equalsIgnoreCase("FRoll")) sink=Sink.FRoll;
@@ -124,10 +133,9 @@ public class ConsoleView extends Observable{
 			else if(opt.equalsIgnoreCase("IRC")) sink=Sink.Irc;
 			else if(opt.equalsIgnoreCase("Logger")) sink=Sink.Logger;
 			else if(opt.equalsIgnoreCase("Null")) sink=Sink.Null;
-
 		}
-		return sink;
 		
+		return sink;
 	}
 	
 	private Reliability selectLevel(Scanner sc){
@@ -137,9 +145,11 @@ public class ConsoleView extends Observable{
 		
 		System.out.println("Introduce the desired reliability level: ");
 		System.out.println("BE, DFO, E2E");
+		
 		while (!ok) {
 			ok=true;
 			opt=sc.nextLine();
+			
 			if (opt.equalsIgnoreCase("be"))rLevel=Reliability.BE;
 			else if (opt.equalsIgnoreCase("e2e"))rLevel=Reliability.E2E;
 			else if (opt.equalsIgnoreCase("dfo"))rLevel=Reliability.DFO;
@@ -148,6 +158,7 @@ public class ConsoleView extends Observable{
 				ok=false;
 			}
 		}
+		
 		return rLevel;
 	}
 
