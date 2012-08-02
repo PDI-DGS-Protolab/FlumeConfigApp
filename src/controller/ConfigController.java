@@ -17,8 +17,11 @@ public class ConfigController implements Observer{
 	private ConsoleView view;
 	
 	public ConfigController(){
-		cw = new ConfigWriter();
 		view = new ConsoleView();
+		view.addObserver(this);
+		cw = new ConfigWriter();
+		cw.addObserver(this);
+		cw.initConf();
 	}
 	
 	@Override

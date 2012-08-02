@@ -24,12 +24,13 @@ public class ConsoleView extends Observable {
 		List<Agent> agents=new LinkedList<Agent>();
 		boolean advanced=true;
 		Scanner sc= new Scanner(System.in);
+		String opt;
 		
 		System.out.println("Introduce the number of agents: ");
-		int n=sc.nextInt();
+		int n=Integer.valueOf(sc.nextLine());
 		
 		System.out.println("Do you wish to have an advanced config? [S/n] ");
-		String opt=sc.nextLine();
+		opt=sc.nextLine();
 		if(opt.equalsIgnoreCase("n")) advanced=false;
 		
 		int port;
@@ -60,7 +61,8 @@ public class ConsoleView extends Observable {
 			Agent a = new Agent(host,port,source,sink,rLevel,channel);
 			agents.add(a);			
 		}	
-
+		setChanged();
+		notifyObservers(agents);		
 	}
 	
 	
@@ -125,7 +127,7 @@ public class ConsoleView extends Observable {
 		
 		while(!ok){
 			opt=sc.nextLine();
-			
+			ok=true;
 			if(opt.equalsIgnoreCase("HDFS")) sink=Sink.HDFS;
 			else if(opt.equalsIgnoreCase("Avro")) sink=Sink.Avro;
 			else if(opt.equalsIgnoreCase("FRoll")) sink=Sink.FRoll;
@@ -133,6 +135,10 @@ public class ConsoleView extends Observable {
 			else if(opt.equalsIgnoreCase("IRC")) sink=Sink.Irc;
 			else if(opt.equalsIgnoreCase("Logger")) sink=Sink.Logger;
 			else if(opt.equalsIgnoreCase("Null")) sink=Sink.Null;
+			else{
+				System.out.println("Incorrect option. Please introduce a valid one: ");
+				ok=false;
+			}
 		}
 		
 		return sink;
@@ -160,10 +166,6 @@ public class ConsoleView extends Observable {
 		}
 		
 		return rLevel;
-	}
-
-	@Override
-	public void notifyObservers(Object obj) {
 	}
 	
 }
