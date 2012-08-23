@@ -6,4 +6,6 @@ public interface MessagesCode {
 	
 	public String startSetup = "StartSetup";
 	
+	public String end = "END";
+	
 }

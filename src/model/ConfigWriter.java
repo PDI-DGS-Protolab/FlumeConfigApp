@@ -6,6 +6,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Observable;
 
+import model.channel.*;
+import model.sink.*;
+import model.source.*;
+
 import constants.MessagesCode;
 
 public class ConfigWriter extends Observable{
@@ -39,36 +43,114 @@ public class ConfigWriter extends Observable{
 	
 	public void writeConfig(List<Agent> agents){
 		int n=1;
-		for (Agent agent : agents) {
-			try {
-				// TODO Write on the config file
-				String message = "agent"+n+".channels.ch1.type = "+ agent.getChannel().name()+'\n';
+		int sink=1;
+		int source=1;
+		int channel=1;
+
+		for (Agent a : agents) {
+			try{
+				Channel c=a.getChannel();
+				Source so=a.getSource();
+				Sink si=a.getSink();
+				String message;
+				if(c instanceof FileChannel){
+					message="agent"+n+".channels.ch"+channel+".type=FILE"+'\n';
+					fos.write(message.getBytes());
+					message="agent"+n+".channels.ch"+channel+".path="+((FileChannel)c).getPath()+'\n';
+				}else if(c instanceof MemoryChannel){
+					message="agent"+n+".channels.ch"+channel+".type=memory"+'\n';
+					fos.write(message.getBytes());
+				}else if(c instanceof JdbcChannel){
+					message="agent"+n+".channels.ch"+channel+".type=jdbc"+'\n';
+					fos.write(message.getBytes());
+				}
+				message="agent"+n+".sources.source"+source+ ".channels = ch"+channel+'\n';
 				fos.write(message.getBytes());
-				message = "agent"+n+".sources.source1.channels = ch1"+'\n';
+				message = "agent"+n+".sinks.sink"+sink+".channel = ch"+channel+'\n';
 				fos.write(message.getBytes());
-				message = "agent"+n+".sources.source1.type = "+agent.getSource().name()+'\n';
+				message = "agent"+n+".channels = ch"+channel+++'\n';
 				fos.write(message.getBytes());
-				message = "agent"+n+".sources.source1.bind ="+agent.getHost()+'\n';
+				
+				if(so instanceof AvroSource){
+					AvroSource as=(AvroSource)so;
+					message = "agent"+n+".sources.source"+source+ ".type = avro"+'\n';
+					fos.write(message.getBytes());
+					message = "agent"+n+".sources.source"+source+ ".bind ="+as.getHostname()+'\n';
+					fos.write(message.getBytes());
+					message = "agent"+n+".sources.source"+source+ ".port ="+as.getPort()+'\n';
+					fos.write(message.getBytes());
+				}else if(so instanceof ExecSource){
+					ExecSource es=(ExecSource)so;
+					message = "agent"+n+".sources.source"+source+ ".type = exec"+'\n';
+					fos.write(message.getBytes());
+					message = "agent"+n+".sources.source"+source+ ".command ="+es.getCommand()+'\n';
+					fos.write(message.getBytes());
+				}else if(so instanceof NetCatSource){
+					NetCatSource as=(NetCatSource)so;
+					message = "agent"+n+".sources.source"+source+ ".type = netcat"+'\n';
+					fos.write(message.getBytes());
+					message = "agent"+n+".sources.source"+source+ ".bind ="+as.getHostname()+'\n';
+					fos.write(message.getBytes());
+					message = "agent"+n+".sources.source"+source+ ".port ="+as.getPort()+'\n';
+					fos.write(message.getBytes());
+				}else if(so instanceof SeqSource){
+					message = "agent"+n+".sources.source"+source+ ".type = seq"+'\n';
+					fos.write(message.getBytes());
+				}else if(so instanceof SyslogSource){
+					SyslogSource as=(SyslogSource)so;
+					message = "agent"+n+".sources.source"+source+ ".type = syslogtcp"+'\n';
+					fos.write(message.getBytes());
+					message = "agent"+n+".sources.source"+source+ ".host ="+as.getHostname()+'\n';
+					fos.write(message.getBytes());
+					message = "agent"+n+".sources.source"+source+ ".port ="+as.getPort()+'\n';
+					fos.write(message.getBytes());
+				}
+				message = "agent"+n+".sources = source"+source+++'\n';
 				fos.write(message.getBytes());
-				message = "agent"+n+".sources.source1.port ="+agent.getPort()+'\n';
+
+				if(si instanceof AvroSink){
+					AvroSink as=(AvroSink)si;
+					message = "agent"+n+".sinks.sink"+sink+".type = avro"+'\n';
+					fos.write(message.getBytes());
+					message = "agent"+n+".sinks.sink"+sink+".hostname ="+as.getHost()+'\n';
+					fos.write(message.getBytes());
+					message = "agent"+n+".sinks.sink"+sink+".port ="+as.getPort()+'\n';
+					fos.write(message.getBytes());
+				}else if(si instanceof HdfsSink){
+					HdfsSink as=(HdfsSink)si;
+					message = "agent"+n+".sinks.sink"+sink+".type = hdfs"+'\n';
+					fos.write(message.getBytes());
+					message = "agent"+n+".sinks.sink"+sink+".hdfs.path ="+as.getPath()+'\n';
+					fos.write(message.getBytes());
+				}else if(si instanceof FileRollSink){
+					message = "agent"+n+".sinks.sink"+sink+".type = FILE_ROLL"+'\n';
+					fos.write(message.getBytes());
+				}else if(si instanceof IrcSink){
+					IrcSink as=(IrcSink)si;
+					message = "agent"+n+".sinks.sink"+sink+".type = irc"+'\n';
+					fos.write(message.getBytes());
+					message = "agent"+n+".sinks.sink"+sink+".hostname ="+as.getHost()+'\n';
+					fos.write(message.getBytes());
+					message = "agent"+n+".sinks.sink"+sink+".port ="+as.getPort()+'\n';
+					fos.write(message.getBytes());
+				}else if(si instanceof LoggerSink){
+					message = "agent"+n+".sinks.sink"+sink+".type = logger"+'\n';
+					fos.write(message.getBytes());
+				}else if(si instanceof NullSink){
+					message = "agent"+n+".sinks.sink"+sink+".type = null"+'\n';
+					fos.write(message.getBytes());
+				}
+				message = "agent"+n+".sinks = sink"+sink+++'\n';
 				fos.write(message.getBytes());
-				message = "agent"+n+".sinks.sink1.channel = ch1"+'\n';
+				message=""+'\n';
 				fos.write(message.getBytes());
-				message = "agent"+n+".sinks.sink1.type = "+agent.getSink().name()+'\n';
-				fos.write(message.getBytes());
-				message = "agent"+n+".sources.source1.channels = ch1"+'\n';
-				fos.write(message.getBytes());
-				message = "agent"+n+".channels = ch1"+'\n';
-				fos.write(message.getBytes());
-				message = "agent"+n+".sources = source1"+'\n';
-				fos.write(message.getBytes());
-				message = "agent"+n+".sinks = sink1"+'\n';
-				fos.write(message.getBytes());
-				n++;
+				n++;				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+		setChanged();
+		notifyObservers(MessagesCode.end);
 	}
 }

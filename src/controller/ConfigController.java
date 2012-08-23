@@ -24,6 +24,7 @@ public class ConfigController implements Observer{
 		cw.initConf();
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void update(Observable obs, Object param) {
 		
@@ -33,6 +34,8 @@ public class ConfigController implements Observer{
 				cw.initConf(path);
 			} else if(param.equals(MessagesCode.startSetup)) {
 				view.startSetup();
+			}else if(param.equals(MessagesCode.end)) {
+				view.end();
 			}
 			
 		} else if (obs.equals(view)) {
