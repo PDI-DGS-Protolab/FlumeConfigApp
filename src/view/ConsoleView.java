@@ -1,5 +1,6 @@
 package view;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
@@ -10,10 +11,6 @@ import model.channel.Channel;
 import model.channel.FileChannel;
 import model.channel.JdbcChannel;
 import model.channel.MemoryChannel;
-import model.enums.ChannelEnum;
-import model.enums.Reliability;
-import model.enums.SinkEnum;
-import model.enums.SourceEnum;
 import model.sink.AvroSink;
 import model.sink.FileRollSink;
 import model.sink.HdfsSink;
@@ -50,10 +47,9 @@ public class ConsoleView extends Observable {
 		opt=sc.nextLine();
 		if(opt.equalsIgnoreCase("n")) advanced=false;
 		
-		int port;
 		for (int i = 0; i < n; i++) {
-			Source source;
-			Sink sink;
+			List<Source> source;
+			List<Sink> sink;
 			Channel channel;
 			
 			System.out.println("Configuring agent number "+(i+1));
@@ -106,103 +102,129 @@ public class ConsoleView extends Observable {
 		
 		return channel;
 	}
-	
-	private Source selectSource(Scanner sc){
-		boolean ok=false;
-		String opt;
-		Source source=null;
-		
-		System.out.println("Enter the desired Source (press intro  to select avro by default)");
-		System.out.println("Avro, Exec, Netcat, SGenerator, Syslog :"); 
-		
-		while(!ok){
-			ok=true;
-			opt=sc.nextLine();
-			
-			if (opt.equalsIgnoreCase("Avro")){
-				System.out.println("Enter the hostname to receive the logs from: ");
-				String h=sc.nextLine();
-				System.out.println("Enter the port number: ");
-				int p=sc.nextInt();
-				source=new AvroSource(h,p);
-			}
-			else if (opt.equalsIgnoreCase("Exec")){
-				System.out.println("Enter the command to execute");
-				String c=sc.nextLine();
-				source=new ExecSource(c);
-			}
-			else if (opt.equalsIgnoreCase("Netcat")){
-				System.out.println("Introduce the hostname to send the logs to: ");
-				String h=sc.nextLine();
-				System.out.println("Introduce the port number: ");
-				int p=sc.nextInt();
-				source=new NetCatSource(h,p);
-			}
-			else if (opt.equalsIgnoreCase("SGenerator")){
-				source=new SeqSource();
-			}
-			else if (opt.equalsIgnoreCase("Syslog")){
-				System.out.println("Introduce the hostname to send the logs to: ");
-				String h=sc.nextLine();
-				System.out.println("Introduce the port number: ");
-				int p=sc.nextInt();
-				source=new SyslogSource(h,p);
-			}
-			else {
-				System.out.println("Incorrect option. Please introduce a valid one: ");
-				ok=false;
-			}
+
+	private List<Source> selectSource(Scanner sc){
+		int n, number=1;;
+		List<Source> sources=new ArrayList<Source>();
+		System.out.println("Enter the number of Sources to configure: ");
+		n=sc.nextInt();
+
+		for (int i = 0; i < n; i++) {
+
+			boolean ok=false;
+			String opt;
+			Source source=null;
+
+			System.out.println('\n'+"Configuring Source "+number++ +'\n'+'\n');
+
+
+			System.out.println("Enter the desired Source (press intro  to select avro by default)");
+			System.out.println("Avro, Exec, Netcat, SGenerator, Syslog :"); 
+
+			while(!ok){
+				ok=true;
+				opt=sc.nextLine();
+
+				if (opt.equalsIgnoreCase("Avro")){
+					System.out.println("Enter the hostname to bind to: ");
+					String h=sc.nextLine();
+					System.out.println("Enter the port number: ");
+					int p=sc.nextInt();
+					source=new AvroSource(h,p);
+				}
+				else if (opt.equalsIgnoreCase("Exec")){
+					System.out.println("Enter the command to execute");
+					String c=sc.nextLine();
+					source=new ExecSource(c);
+				}
+				else if (opt.equalsIgnoreCase("Netcat")){
+					System.out.println("Introduce the hostname to bind to: ");
+					String h=sc.nextLine();
+					System.out.println("Introduce the port number: ");
+					int p=sc.nextInt();
+					source=new NetCatSource(h,p);
+				}
+				else if (opt.equalsIgnoreCase("SGenerator")){
+					source=new SeqSource();
+				}
+				else if (opt.equalsIgnoreCase("Syslog")){
+					System.out.println("Introduce the hostname to bind to: ");
+					String h=sc.nextLine();
+					System.out.println("Introduce the port number: ");
+					int p=sc.nextInt();
+					source=new SyslogSource(h,p);
+				}
+				else {
+					System.out.println("Incorrect option. Please introduce a valid one: ");
+					ok=false;
+				}
+				if(ok)sources.add(source);
+			}			
 		}
-		
-		return source;
+
+
+
+		return sources;
 	}
-	
-	private Sink selectSink(Scanner sc){
-		boolean ok=false;
-		String opt;
-		Sink sink=null;
-		
-		System.out.println("Introduce the desired Sink (press intro to select avro by default)");
-		System.out.println("HDFS, Logger, Avro, Irc, FRoll, Null, HBase :");
-		
-		while(!ok){
-			opt=sc.nextLine();
-			ok=true;
-			if(opt.equalsIgnoreCase("HDFS")){
-				System.out.println("Introduce the path in which to store the logs: ");
-				String p=sc.nextLine();
-				sink=new HdfsSink(p);
-			}
-			else if(opt.equalsIgnoreCase("Avro")){
-				System.out.println("Introduce the hostname to send the logs to: ");
-				String h=sc.nextLine();
-				System.out.println("Introduce the port number: ");
-				int p=sc.nextInt();
-				sink=new AvroSink(h, p);
-			}
-			else if(opt.equalsIgnoreCase("FRoll")){
-				sink=new FileRollSink();
-			}
-			else if(opt.equalsIgnoreCase("IRC")){
-				System.out.println("Introduce the hostname to send the logs to: ");
-				String h=sc.nextLine();
-				System.out.println("Introduce the port number: ");
-				int p=sc.nextInt();
-				sink=new IrcSink(h, p);
-			}
-			else if(opt.equalsIgnoreCase("Logger")){
-				sink=new LoggerSink();
-			}
-			else if(opt.equalsIgnoreCase("Null")){
-				sink=new NullSink();
-			}
-			else{
-				System.out.println("Incorrect option. Please introduce a valid one: ");
-				ok=false;
+
+	private List<Sink> selectSink(Scanner sc){
+
+		int n, number=1;;
+		List<Sink> sinks=new ArrayList<Sink>();
+		System.out.println("Enter the number of Sinks to configure: ");
+		n=sc.nextInt();
+
+		for (int i = 0; i < n; i++) {
+
+			boolean ok=false;
+			String opt;
+			Sink sink=null;
+			
+			System.out.println("Configuring Source "+number++ +'\n'+'\n');
+
+			System.out.println("Introduce the desired Sink (press intro to select avro by default)");
+			System.out.println("HDFS, Logger, Avro, Irc, FRoll, Null, HBase :");
+
+			while(!ok){
+				opt=sc.nextLine();
+				ok=true;
+				if(opt.equalsIgnoreCase("HDFS")){
+					System.out.println("Introduce the path in which to store the logs: ");
+					String p=sc.nextLine();
+					sink=new HdfsSink(p);
+				}
+				else if(opt.equalsIgnoreCase("Avro")){
+					System.out.println("Introduce the hostname to send the logs to: ");
+					String h=sc.nextLine();
+					System.out.println("Introduce the port number: ");
+					int p=sc.nextInt();
+					sink=new AvroSink(h, p);
+				}
+				else if(opt.equalsIgnoreCase("FRoll")){
+					sink=new FileRollSink();
+				}
+				else if(opt.equalsIgnoreCase("IRC")){
+					System.out.println("Introduce the hostname to send the logs to: ");
+					String h=sc.nextLine();
+					System.out.println("Introduce the port number: ");
+					int p=sc.nextInt();
+					sink=new IrcSink(h, p);
+				}
+				else if(opt.equalsIgnoreCase("Logger")){
+					sink=new LoggerSink();
+				}
+				else if(opt.equalsIgnoreCase("Null")){
+					sink=new NullSink();
+				}
+				else{
+					System.out.println("Incorrect option. Please introduce a valid one: ");
+					ok=false;
+				}
+				if(ok)sinks.add(sink);
 			}
 		}
-		
-		return sink;
+
+		return sinks;
 	}
 	
 	public void end(){

@@ -3,7 +3,6 @@ package model.channel;
 import model.enums.ChannelEnum;
 
 public class FileChannel implements Channel{
-	private String type="file";
 	private String path;
 	
 	public FileChannel(String p){
