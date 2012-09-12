@@ -159,7 +159,7 @@ public class ConfigWriter extends Observable{
 				message=message.concat("\n");
 				fos.write(message.getBytes());
 				
-				message=""+'\n';
+				message="\n";
 				fos.write(message.getBytes());
 				n++;	
 				channel++;

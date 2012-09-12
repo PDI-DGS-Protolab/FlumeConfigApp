@@ -115,7 +115,7 @@ public class ConsoleView extends Observable {
 			String opt;
 			Source source=null;
 
-			System.out.println('\n'+"Configuring Source "+number++ +'\n'+'\n');
+			System.out.println("\nConfiguring Source "+number++ +"\n\n");
 
 
 			System.out.println("Enter the desired Source (press intro  to select avro by default)");
@@ -180,7 +180,7 @@ public class ConsoleView extends Observable {
 			String opt;
 			Sink sink=null;
 			
-			System.out.println("Configuring Source "+number++ +'\n'+'\n');
+			System.out.println("\nConfiguring Source "+number++ +"\n\n");
 
 			System.out.println("Introduce the desired Sink (press intro to select avro by default)");
 			System.out.println("HDFS, Logger, Avro, Irc, FRoll, Null, HBase :");
@@ -222,6 +222,7 @@ public class ConsoleView extends Observable {
 				}
 				if(ok)sinks.add(sink);
 			}
+			System.out.println("\n");
 		}
 
 		return sinks;
