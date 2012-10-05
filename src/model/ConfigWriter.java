@@ -53,103 +53,39 @@ public class ConfigWriter extends Observable{
 				Source so=a.getSource();
 				Sink si=a.getSink();
 				String message;
-				if(c instanceof FileChannel){
-					message="agent"+n+".channels.ch"+channel+".type=FILE"+'\n';
-					fos.write(message.getBytes());
-					message="agent"+n+".channels.ch"+channel+".path="+((FileChannel)c).getPath()+'\n';
-				}else if(c instanceof MemoryChannel){
-					message="agent"+n+".channels.ch"+channel+".type=memory"+'\n';
-					fos.write(message.getBytes());
-				}else if(c instanceof JdbcChannel){
-					message="agent"+n+".channels.ch"+channel+".type=jdbc"+'\n';
-					fos.write(message.getBytes());
-				}
+
+				// The channel instance writes the proper message 
+				c.writeMessage(fos, n, channel);
+
 				message="agent"+n+".sources.source"+source+ ".channels = ch"+channel+'\n';
 				fos.write(message.getBytes());
 				message = "agent"+n+".sinks.sink"+sink+".channel = ch"+channel+'\n';
 				fos.write(message.getBytes());
-				message = "agent"+n+".channels = ch"+channel+++'\n';
+				message = "agent"+n+".channels = ch"+channel++ +'\n';
 				fos.write(message.getBytes());
-				
-				if(so instanceof AvroSource){
-					AvroSource as=(AvroSource)so;
-					message = "agent"+n+".sources.source"+source+ ".type = avro"+'\n';
-					fos.write(message.getBytes());
-					message = "agent"+n+".sources.source"+source+ ".bind ="+as.getHostname()+'\n';
-					fos.write(message.getBytes());
-					message = "agent"+n+".sources.source"+source+ ".port ="+as.getPort()+'\n';
-					fos.write(message.getBytes());
-				}else if(so instanceof ExecSource){
-					ExecSource es=(ExecSource)so;
-					message = "agent"+n+".sources.source"+source+ ".type = exec"+'\n';
-					fos.write(message.getBytes());
-					message = "agent"+n+".sources.source"+source+ ".command ="+es.getCommand()+'\n';
-					fos.write(message.getBytes());
-				}else if(so instanceof NetCatSource){
-					NetCatSource as=(NetCatSource)so;
-					message = "agent"+n+".sources.source"+source+ ".type = netcat"+'\n';
-					fos.write(message.getBytes());
-					message = "agent"+n+".sources.source"+source+ ".bind ="+as.getHostname()+'\n';
-					fos.write(message.getBytes());
-					message = "agent"+n+".sources.source"+source+ ".port ="+as.getPort()+'\n';
-					fos.write(message.getBytes());
-				}else if(so instanceof SeqSource){
-					message = "agent"+n+".sources.source"+source+ ".type = seq"+'\n';
-					fos.write(message.getBytes());
-				}else if(so instanceof SyslogSource){
-					SyslogSource as=(SyslogSource)so;
-					message = "agent"+n+".sources.source"+source+ ".type = syslogtcp"+'\n';
-					fos.write(message.getBytes());
-					message = "agent"+n+".sources.source"+source+ ".host ="+as.getHostname()+'\n';
-					fos.write(message.getBytes());
-					message = "agent"+n+".sources.source"+source+ ".port ="+as.getPort()+'\n';
-					fos.write(message.getBytes());
-				}
+
+				// The source instance writes the proper message
+				so.writeMessage(fos, n, source);
+
 				message = "agent"+n+".sources = source"+source+++'\n';
 				fos.write(message.getBytes());
 
-				if(si instanceof AvroSink){
-					AvroSink as=(AvroSink)si;
-					message = "agent"+n+".sinks.sink"+sink+".type = avro"+'\n';
-					fos.write(message.getBytes());
-					message = "agent"+n+".sinks.sink"+sink+".hostname ="+as.getHost()+'\n';
-					fos.write(message.getBytes());
-					message = "agent"+n+".sinks.sink"+sink+".port ="+as.getPort()+'\n';
-					fos.write(message.getBytes());
-				}else if(si instanceof HdfsSink){
-					HdfsSink as=(HdfsSink)si;
-					message = "agent"+n+".sinks.sink"+sink+".type = hdfs"+'\n';
-					fos.write(message.getBytes());
-					message = "agent"+n+".sinks.sink"+sink+".hdfs.path ="+as.getPath()+'\n';
-					fos.write(message.getBytes());
-				}else if(si instanceof FileRollSink){
-					message = "agent"+n+".sinks.sink"+sink+".type = FILE_ROLL"+'\n';
-					fos.write(message.getBytes());
-				}else if(si instanceof IrcSink){
-					IrcSink as=(IrcSink)si;
-					message = "agent"+n+".sinks.sink"+sink+".type = irc"+'\n';
-					fos.write(message.getBytes());
-					message = "agent"+n+".sinks.sink"+sink+".hostname ="+as.getHost()+'\n';
-					fos.write(message.getBytes());
-					message = "agent"+n+".sinks.sink"+sink+".port ="+as.getPort()+'\n';
-					fos.write(message.getBytes());
-				}else if(si instanceof LoggerSink){
-					message = "agent"+n+".sinks.sink"+sink+".type = logger"+'\n';
-					fos.write(message.getBytes());
-				}else if(si instanceof NullSink){
-					message = "agent"+n+".sinks.sink"+sink+".type = null"+'\n';
-					fos.write(message.getBytes());
-				}
+				// The sink instance writes the proper message
+				si.writeMessage(fos, n, sink);
+				
 				message = "agent"+n+".sinks = sink"+sink+++'\n';
 				fos.write(message.getBytes());
 				message=""+'\n';
 				fos.write(message.getBytes());
-				n++;				
+				n++;		
+				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+		
+		// Notifying changes
 		setChanged();
 		notifyObservers(MessagesCode.end);
 	}
